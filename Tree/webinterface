@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-  Timetracker
+  Trees
 
 =cut
 
@@ -15,21 +15,34 @@ use Admins;
 use XML::Simple qw(:strict);
 
 use Abills::Fetcher qw/web_request/;
-use Tree::db::Tree;
+use Tree;
 
-our ($html, %FORM, $db, %conf, $admin, %lang, @WEEKDAYS);
-my  ($table);
+our ($html, %FORM, $db, %conf, $admin, %lang, @WEEKDAYS, $index);
+my  ($table, $button_add, $button_change);
 
-sub tree_list {
+sub add_type {
 
   my $Tree = Tree->new($db, $admin, \%conf);
-  my $positions_list = $Tree->position_list({ COLS_NAME => 1 });
+  my $type_list = $Tree->type_list({ COLS_NAME => 1 });
 
-  $html->tpl_show(_include('main_page_one', 'Tree'));
+  if ($FORM{ADD}) {
+    $Tree->add_type({%FORM});
+    $html->message('info', 'Добавлено', 'Тип добавлено в список');
+  } elsif ($FORM{del}) {
+    $Tree->del_type({ID => $FORM{del} });
+    $html->message('err', 'Видалено', 'Тип видалено з списка');
+  } elsif ($FORM{CHANGE}) {
+    $Tree->type_change(\%FORM);
+    $html->message('warn', 'Змінити', 'Ви намагаєтеся змніти данні');
+  }
 
-  ($table, $positions_list) = result_former({
+  $button_add    = $html->form_input("ADD", $lang{ADD}, {TYPE => "submit"});
+  $button_change = $html->form_input("CHANGE", $lang{CHANGE}, {TYPE => "submit"});
+
+  ($table, $type_list) = result_former({
     INPUT_DATA          => $Tree,
-    LIST                => $positions_list,
+    FUNCTION            => 'type_list',
+    LIST                => $type_list,
     BASE_FIELDS         => 2,
     SKIP_USER_TITLE     => 1,
     DEFAULT_FIELDS      => 'id, TYPE',
@@ -48,14 +61,25 @@ sub tree_list {
     MODULE    => 'Tree',
   });
 
-  foreach my $line (@$positions_list) {
+  foreach my $line (@$type_list) {
       my @fields_array = ();
 
       push @fields_array, $line->{"id"};
       push @fields_array, $line->{"type_of_tree"};
-      $table->addrow(@fields_array);
 
+      push @fields_array, ($html->button($lang{CHANGE}, "index=$index&id=$line->{id}&type_of_tree=$line->{type_of_tree}&CHANGE=1"._translate($line->{position}), { class => 'change' }));
+      push @fields_array, ($html->button($lang{DELETE}, "index=$index&del=$line->{id}&type_of_tree=$line->{type_of_tree}"._translate($line->{position}), { class => 'del' }));
+
+      $table->addrow(@fields_array);
     }
+
+    $html->tpl_show(_include('main_page_one', 'Tree'), {
+      ID            => $FORM{id},
+      INDEX         => $index,
+      ADD_TREE      => $html->form_input('TYPE_OF_TREE', $FORM{type_of_tree}),
+      BUTTON_ADD    => $button_add,
+      BUTTON_CHANGE => $button_change,
+    });
   print $table->show();
 
   return 1;

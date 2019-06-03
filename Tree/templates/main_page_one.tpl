@@ -1,16 +1,21 @@
-<div class="box box-primary">
+<div class="box box-theme box-form">
   <div class="box-header with-border">
     <h3 class="box-title">Додати тип</h3>
   </div>
-  <form role="form">
+  <form action="index.cgi" method="post">
+    <input hidden="" name="index" value="%INDEX%">
+    <input hidden="" name="ID" value="%ID%">
     <div class="box-body">
       <div class="form-group">
-        <label for="exampleInputEmail1">Тип дерева</label>
-        <input type="email" class="form-control" id="typeTree" placeholder="Тип дерева">
+        <label class="control-label col-md-3" for="RATECODE_ID">Тип дерева</label>
+        <div class="col-md-9">
+          %ADD_TREE%
+        </div>
       </div>
     </div>
-    <div class="box-footer">
-      <button type="submit" class="btn btn-primary">Додати</button>
+    <div class="box-footer text-center">
+      %BUTTON_ADD%
+      %BUTTON_CHANGE%
     </div>
   </form>
 </div>

@@ -1,8 +1,9 @@
 #Iner_ID : Main or Sub or if -1 user menu func list
 %FUNCTIONS_LIST = (
-  "01:0:tree_list:tree_list:"                   => 1,
+  "01:0:$lang{TREE}:null:"                              => 1,
+  "02:1:$lang{ADD_TYPE}:add_type:"                      => 1,
 );
 
 %USER_FUNCTION_LIST = (
-  "01:0:tree_list:tree_list:"                     => 0,
+  #"01:0:$lang{ADD_TYPE}:add_type:"                     => 0,
 );
