@@ -2,12 +2,12 @@ package Tree;
 
 =head1 NAME
 
-  Tree - module for Employees configuration
+  Tree - module for Tree configuration
 
 =head1 SYNOPSIS
 
-  use Employees;
-  my $Employees = Employees->new($db, $admin, \%conf);
+  use Tree;
+  my $Tree = Tree->new($db, $admin, \%conf);
 
 =cut
 
@@ -75,7 +75,7 @@ sub add_type {
 =cut
 
 #*******************************************************************
-sub del_position {
+sub del_type{
   my $self = shift;
   my ($attr) = @_;
 
@@ -87,16 +87,15 @@ sub del_position {
 
 #**********************************************************
 
-=head2 function type_list() - get articles list
+=head2 function type_list() - get type list
 
   Arguments:
     $attr
-      SUBORDINATION -
   Returns:
     @list
 
   Examples:
-    my $list = $Employees->position_list({COLS_NAME=>1});
+    my $list = $Tree->type_list({COLS_NAME=>1});
 
 =cut
 
@@ -118,44 +117,26 @@ sub type_list {
 }
 
 #**********************************************************
-sub update_list {
-  my $self = shift;
-  my ($attr) = @_;
-
-  my @WHERE_RULES = ();
-  my $SORT        = ($attr->{SORT}) ? $attr->{SORT} : 1;
-  my $DESC        = ($attr->{DESC}) ? $attr->{DESC} : '';
-
-  $self->query2(
-  "UPDATE user SET name, deposit, registration, nicname, status, arrears",
-  undef, $attr
-  );
-
-  return $self->{list};
-}
-
-
-#**********************************************************
-=head2 function position_info() - get position info
+=head2 function type_info() - get type info
 
   Arguments:
     $attr
-      ID - position identifier
+      ID - type identifier
   Returns:
     $self object
 
   Examples:
-    my $list = $Employees->position_info({ ID => 1 });
+    my $list = $Tree->type_info({ ID => 1 });
 
 =cut
 #**********************************************************
-sub position_info {
+sub type_info {
 	my $self = shift;
   my ($attr) = @_;
 
   if ($attr->{id}) {
     $self->query2(
-      "SELECT * FROM user
+      "SELECT * FROM trees_type 
       WHERE id = ?;", undef, { id => 1, Bind => [ $attr->{id} ] }
     );
   }
@@ -164,32 +145,30 @@ sub position_info {
 }
 
 #**********************************************************
-=head2 function position_change() - get articles list
+=head2 function type_change() - change type
 
   Arguments:
     $attr
-      ID            - position identifier;
-      POSITION      - position name;
-      SUBORDINATION - id of highier position;
+      ID            - type identifier;
+      TYPE_OF_TREE  - type of tree;
 
   Returns:
     $self object
 
   Examples:
-    my $list = $Employees->position_change({ ID       => 2,
-                                             POSITION => "Admin",
-                                             SUBORDINATION => 1 });
+    my $list = $Tree->type_change({ ID           => 2,
+                                    TYPE_OF_TREE => "Вічнозелені",});
 
 =cut
 #**********************************************************
-sub position_change {
+sub type_change {
 	my $self = shift;
   my ($attr) = @_;
 
   $self->changes2(
     {
       CHANGE_PARAM => 'ID',
-      TABLE        => 'user',
+      TABLE        => 'trees_type',
       DATA         => $attr
     }
   );
