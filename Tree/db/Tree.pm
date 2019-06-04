@@ -254,7 +254,7 @@ sub species_list {
   my $DESC        = ($attr->{DESC}) ? $attr->{DESC} : '';
 
   $self->query2(
-  "SELECT id, type_id, species FROM trees_species",
+  "SELECT trees_species.id, type_of_tree, species FROM trees_species, trees_type WHERE type_id=trees_type.id",
   undef, $attr
   );
 
