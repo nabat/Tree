@@ -127,6 +127,7 @@ sub type_list {
 
   Examples:
     my $list = $Tree->type_info({ ID => 1 });
+  вона не працює чи я її не розумію
 
 =cut
 #**********************************************************
@@ -156,8 +157,8 @@ sub type_info {
     $self object
 
   Examples:
-    my $list = $Tree->type_change({ ID           => 2,
-                                    TYPE_OF_TREE => "Вічнозелені",});
+    $Tree->type_change({ ID           => 2,
+                         TYPE_OF_TREE => "Вічнозелені",});
 
 =cut
 #**********************************************************
@@ -176,4 +177,121 @@ sub type_change {
   return $self;
 }
 
+#*******************************************************************
+=head2 function add_species() - add tree species
+
+  Arguments:
+    %$attr
+      TYPE_ID - ID of tree type
+      SPECIES - species
+
+  Returns:
+    $self object
+
+  Examples:
+    $Tree->add_species({
+      TYPE_ID => $FORM{TYPE_ID},
+      SPECIES => $FORM{SPECIES},
+    });
+
+=cut
+
+#*******************************************************************
+sub add_species {
+  my $self = shift;
+  my ($attr) = @_;
+
+  $self->query_add('trees_species', {%$attr});
+
+  return $self;
+}
+
+#*******************************************************************
+
+=head2 function del_species() - delete species from db
+  Arguments:
+    $attr
+
+  Returns:
+
+  Examples:
+    $Tree->del_species( {ID => 1} );
+
+=cut
+
+#*******************************************************************
+sub del_species {
+  my $self = shift;
+  my ($attr) = @_;
+
+  $self->query_del('trees_species', $attr);
+
+  return $self;
+}
+
+
+#**********************************************************
+
+=head2 function species_list() - get species list
+
+  Arguments:
+    $attr
+  Returns:
+    @list
+
+  Examples:
+    my $list = $Tree->species_list({COLS_NAME=>1});
+
+=cut
+
+#**********************************************************
+sub species_list {
+  my $self = shift;
+  my ($attr) = @_;
+
+  my @WHERE_RULES = ();
+  my $SORT        = ($attr->{SORT}) ? $attr->{SORT} : 1;
+  my $DESC        = ($attr->{DESC}) ? $attr->{DESC} : '';
+
+  $self->query2(
+  "SELECT id, type_id, species FROM trees_species",
+  undef, $attr
+  );
+
+  return $self->{list};
+}
+
+#**********************************************************
+=head2 function species_change() - change species
+
+  Arguments:
+    $attr
+      ID      - species identifier;
+      TYPE_ID - type of tree identifier;
+      SPECIES - species;
+
+  Returns:
+    $self object
+
+  Examples:
+    $Tree->species_change({ ID      => 2,
+                            TYPE_ID => 3,
+                            SPECIES => "Береза"});
+
+=cut
+#**********************************************************
+sub species_change {
+	my $self = shift;
+  my ($attr) = @_;
+
+  $self->changes2(
+    {
+      CHANGE_PARAM => 'ID',
+      TABLE        => 'trees_species',
+      DATA         => $attr
+    }
+  );
+
+  return $self;
+}
 1;
