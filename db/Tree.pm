@@ -294,4 +294,77 @@ sub species_change {
 
   return $self;
 }
+
+#**********************************************************
+
+=head2 function tree_list() - show and search trees
+
+  Arguments:
+    $attr
+      MIN_AGE
+      MAX_AGE
+      TYPE_ID
+      SPECIES_ID
+      STATUS
+  Returns:
+    @list
+
+  Examples:
+    my $list = $Tree->tree_list({COLS_NAME=>1});
+
+=cut
+
+#**********************************************************
+sub tree_list {
+  my $self = shift;
+  my ($attr) = @_;
+
+  my @WHERE_RULES = ();
+  my $SORT        = ($attr->{SORT}) ? $attr->{SORT} : 1;
+  my $DESC        = ($attr->{DESC}) ? $attr->{DESC} : '';
+  #if (defined($attr->{TYPE_ID})) {
+  #  push @WHERE_RULES, "trees_tree.='$attr->{SUBORDINATION}'";
+  #}
+  #push @WHERE_RULES, "trees_tree.species_id=trees_species.id AND trees_species.type_id=trees_type.id";
+  if (defined($attr->{MIN_AGE})) {
+    push @WHERE_RULES, "age>='$attr->{MIN_AGE}'";
+  }
+  if (defined($attr->{MAX_AGE})) {
+    push @WHERE_RULES, "age<='$attr->{MAX_AGE}'";
+  }
+  if (defined($attr->{TYPE_ID})) {
+    push @WHERE_RULES, "(SELECT type_id FROM trees_species WHERE id=species_id)='$attr->{TYPE_ID}'";
+  }
+  if (defined($attr->{SPECIES_ID})) {
+    push @WHERE_RULES, "species_id='$attr->{SPECIES_ID}'";
+  }
+  if (defined($attr->{STATUS})) {
+    push @WHERE_RULES, "status='$attr->{STATUS}'";
+  }
+  
+  my $WHERE = $self->search_former($attr, [],
+  { WHERE       => 1,
+    WHERE_RULES => \@WHERE_RULES
+  });
+  $self->query2(
+  "SELECT tr.id,
+          tr.ext_id,
+          tr.species_id,
+          tr.age,
+          tr.coordx,
+          tr.coordy,
+          tr.status,
+          tr.comment,
+          (SELECT species FROM trees_species WHERE id=species_id) AS species,
+          (SELECT type_id FROM trees_species WHERE id=species_id) AS type_id
+          FROM
+          trees_tree AS tr
+          $WHERE
+          ORDER BY $SORT $DESC",
+  undef, $attr
+  );
+
+  return $self->{list};
+}
+
 1;
