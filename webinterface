@@ -13,7 +13,7 @@ use Abills::Base qw(time2sec);
 use Tree::db::Tree;
 use Data::Dumper;
 
-our ($html, %FORM, $db, %conf, $admin, %lang, @WEEKDAYS, $index);
+our ($html, %FORM, $db, %conf, $admin, %lang, $index);
 my  ($table, $button_add, $button_change);
 
 sub add_type {
@@ -140,7 +140,7 @@ sub add_sort {
   });
 
   $html->tpl_show(_include('main_page_two', 'Tree'), {
-    TYPE_TREE        => $html->form_select(
+    TYPE_TREE        =>  $html->form_select(
       'TYPE_ID',
       {
           SELECTED    => $FORM{TYPE_ID},
@@ -159,14 +159,16 @@ sub add_sort {
     ADD_TREE_SORT    => $html->form_input('SPECIES', $FORM{SPECIES} ),
   });
 
+
   foreach my $line (@$species_list) {
     my @fields_array = ();
+
     push @fields_array, $line->{"id"};
     push @fields_array, $line->{"type_of_tree"};
     push @fields_array, $line->{"species"};
 
     push @fields_array, ($html->button($lang{CHANGE},
-        "index=$index&ID=$line->{id}&TYPE_ID=$line->{type_id}&SPECIES=$line->{species}&CHANGE=1"._translate($line->{position} ),
+        "index=$index&ID=$line->{id}&TYPE_ID=$line->{type_of_tree}&SPECIES=$line->{species}&CHANGE=1"._translate($line->{position} ),
         { class => 'change' } ));
     push @fields_array, ($html->button($lang{DELETE},
         "index=$index&del=$line->{id}"._translate($line->{position} ),
@@ -198,7 +200,22 @@ sub search_tree {
   my @type = ();
   my @sort = ();
 
- print Dumper $tree_list;
+    $button_search = $html->form_input("SEARCH", $lang{SEARCH}, {TYPE => "submit"} );
+    $button_clear  = $html->form_input("CLEAR",  $lang{CLEAR},  {TYPE => "submit"} );
+
+    # $Tree->add_tree({
+    #     EXT_ID     => "2",
+    #     SPECIES_ID => 43,
+    #     AGE        => 92,
+    #     COORDX     => 48.5303,
+    #     COORDY     => 25.5303,
+    #     STATUS     => "Хворе",
+    #     COMMENT    => " ",
+    # });
+
+    if ($FORM{del}) {
+        $Tree->del_tree({ID => $FORM{del}})
+    }
 
     # my $js_locations_arr;
     # foreach my $tree (@$tree_list){
@@ -206,16 +223,13 @@ sub search_tree {
     # }
     my $js_locations_arr;
     foreach my $tree (@$tree_list){
-        my $name = "<h3>"       . $tree -> {species} . "</h3>" .
+        my $name = "<h3>"           . $tree -> {species} . "</h3>" .
             "<b>Номер дерева: </b>" . $tree -> {ext_id}  . "<br>" .
             "<b>Вік: </b>"          . $tree -> {age}     . "<br>" .
             "<b>Статус: </b>"       . $tree -> {status};
         $js_locations_arr.= "[\"" . $name . "\"," . $tree -> {coordx} . "," . $tree -> {coordy} . "," . $tree -> {id} . "],";
     }
 
-
-  $button_search = $html->form_input("SEARCH", $lang{SEARCH}, {TYPE => "submit"} );
-  $button_clear  = $html->form_input("CLEAR",  $lang{CLEAR},  {TYPE => "submit"} );
 
   push @type, "--";
   foreach my $line (@$type_list) {
@@ -262,6 +276,10 @@ sub search_tree {
     PLACE         => "Парк чайковського",
   });
 
+    if ($FORM{CHANGE}) {
+        edit_tree();
+    }
+
   ($table, $tree_list) = result_former( {
     INPUT_DATA          => $Tree,
     LIST                => $tree_list,
@@ -291,21 +309,35 @@ sub search_tree {
   });
 
   foreach my $line (@$tree_list) {
-    my @fields_array = ();
+        my @fields_array = ();
 
-    push @fields_array, $line->{"id"};
-    push @fields_array, $line->{"ext_id"};
-    push @fields_array, $line->{"species"};
-    push @fields_array, $line->{"age"};
-    push @fields_array, $line->{"coordx"};
-    push @fields_array, $line->{"coordy"};
-    push @fields_array, $line->{"status"};
-    push @fields_array, $line->{"comment"};
+        push @fields_array, $line->{"id"};
+        push @fields_array, $line->{"ext_id"};
+        push @fields_array, $line->{"species"};
+        push @fields_array, $line->{"age"};
+        push @fields_array, $line->{"coordx"};
+        push @fields_array, $line->{"coordy"};
+        push @fields_array, $line->{"status"};
+        push @fields_array, $line->{"comment"};
 
-    $table->addrow(@fields_array);
+
+        push @fields_array, ($html->button($lang{CHANGE},
+          "index=$index&ID=$line->{id}&EXT_ID=$line->{ext_id}&SPECIES=$line->{species}&AGE=$line->{age}&COORDX=$line->{coordx}&COORDY=$line->{coordy}&STATUS=$line->{status}&COMMENT=$line->{comment}&CHANGE=1"._translate($line->{position} ),
+          { class => 'change' } ));
+        push @fields_array, ($html->button($lang{DELETE},
+          "index=$index&del=$line->{id}"._translate($line->{position} ),
+          { class => 'del' } ));
+
+        $table->addrow(@fields_array);
   }
 
   print $table->show();
+
+    return 1;
+}
+
+sub edit_tree {
+    $html->tpl_show(_include('main_page_five', 'Tree'));
 }
 
 1;
