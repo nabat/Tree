@@ -70,22 +70,15 @@
 
             </div>
             <div class="col-md-7 col-sm-7">
+                <!-- Занесення координат в адресну строку -->
+                <input hidden="" id="cord_x" name="COORD_X" value="">
+                <input hidden="" id="cord_y" name="COORD_Y" value="">
+                <!-- Створення мапи -->
                 <div id="map" style="width: 100%; height: 450px;"></div>
-
                 <script>
-                    // Initialize and add the map
-                    //function initMap() {
 
-
-                      //  var location = { lat:%COORD_X%, lng:%COORD_Y% };
-
-
-                        //var map = new google.maps.Map(
-                          //  document.getElementById('map'), {zoom: 16, center: location});
-                        // The marker, positioned at Uluru
-                        //var marker = new google.maps.Marker({position: location, map: map});
-                    //}
                     var map, infoWindow;
+
                     function initMap() {
                         map = new google.maps.Map(document.getElementById('map'), {
                             center: {lat: %COORD_X%, lng: %COORD_Y%},
@@ -93,27 +86,17 @@
                         });
                         infoWindow = new google.maps.InfoWindow;
 
-                        // Try HTML5 geolocation.
                         if (navigator.geolocation) {
                             navigator.geolocation.getCurrentPosition(function(position) {
                                 var pos = {
                                     lat: position.coords.latitude,
                                     lng: position.coords.longitude
                                 };
-                                // infoWindow.setPosition(pos);
-                                // infoWindow.setContent(pos.lat,pos.lng);
                                 var marker = new google.maps.Marker({position: pos, map: map});
                                 infoWindow.open(map);
                                 map.setCenter(pos);
-                                alert(window.location+'&'+'COORD_X='+pos.lat+'&'+'COORD_X='+pos.lng);
-                                alert(window.location.href);
-                                // var originURL = window.location.href;
-                                // var coordinates = +'&'+'COORD_X='+pos.lat+'&'+'COORD_X='+pos.lng;
-                                //
-                                // if (document.getElementById('ADD')){
-                                //     window.location.assign(originURL+coordinates);
-                                // }
-
+                                document.getElementById('cord_x').setAttribute('value', pos.lat);
+                                document.getElementById('cord_y').setAttribute('value', pos.lng);
                             }, function() {
                                 handleLocationError(true, infoWindow, map.getCenter());
                             });

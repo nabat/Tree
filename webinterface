@@ -13,13 +13,15 @@ use Abills::Base qw(time2sec);
 use Timetracker::db::Timetracker;
 use Admins;
 use XML::Simple qw(:strict);
-
+use CGI qw(:standard);
 use Abills::Fetcher qw/web_request/;
 use Tree;
 use Data::Dumper;
 
 our ($html, %FORM, $db, %conf, $admin, %lang, @WEEKDAYS, $index);
 my  ($table, $button_add, $button_change);
+# my $coord_x = param('coord_x');
+# my $coord_y = param('coord_y');
 
 sub add_type {
 
@@ -276,10 +278,17 @@ sub add_trees {
     my $cord_x = 48.537917;
     my $cord_y = 25.024278;
     my $location_id = 1;
-    my @locations = ($place,$cord_x,$cord_y,$location_id);
 
     if ($FORM{ADD}) {
-        $Tree->add_species({%FORM});
+        $Tree->add_tree({
+            EXT_ID     => $FORM{TREE_ID},
+            SPECIES_ID => $FORM{SPECIES_ID},
+            AGE        => $FORM{AGE},
+            COORDX     => $FORM{COORD_X},
+            COORDY     => $FORM{COORD_Y},
+            STATUS     => $FORM{STATUS},
+            COMMENT    => $FORM{COMMENTS},
+        });
         $html->message('info', $lang{ADD_MESSEGES}, $lang{SUC_TYPE});
     } elsif ($FORM{del}) {
         $Tree->del_species({ID => $FORM{del} });
@@ -300,6 +309,8 @@ sub add_trees {
     foreach my $line (@$species) {
         push @files_species, $line->{"species"};
     }
+
+    # print $coord_x." ".$coord_y;
 
     $html->tpl_show(_include('main_page_four','Tree'), {
         TYPE_TREE     => $html->form_select(
@@ -323,7 +334,6 @@ sub add_trees {
         AGE           => $html->form_input('AGE', $FORM{age}),
         STATUS        => $html->form_input('STATUS', $FORM{status}),
         TREE_ID       => $html->form_input('TREE_ID', $FORM{tree_id}),
-        COMMENT       => $html->form_input('COMMENT', $FORM{comment}),
         CORD_X        => $html->form_input('CORD_X', $FORM{cord_x}),
         CORD_Y        => $html->form_input('CORD_Y', $FORM{cord_y}),
         PLACE         => $place,
@@ -331,6 +341,7 @@ sub add_trees {
         COORD_Y       => $cord_y,
         LOCATION_ID   => $location_id
     });
+    return 1;
 
 }
 
