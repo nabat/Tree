@@ -168,7 +168,7 @@ sub add_sort {
     push @fields_array, $line->{"species"};
 
     push @fields_array, ($html->button($lang{CHANGE},
-        "index=$index&ID=$line->{id}&TYPE_ID=$line->{type_of_tree}&SPECIES=$line->{species}&CHANGE=1"._translate($line->{position} ),
+        "index=$index&ID=$line->{id}&TYPE_ID=$line->{type_id}&SPECIES=$line->{species}&CHANGE=1"._translate($line->{position} ),
         { class => 'change' } ));
     push @fields_array, ($html->button($lang{DELETE},
         "index=$index&del=$line->{id}"._translate($line->{position} ),
