@@ -295,6 +295,45 @@ sub species_change {
   return $self;
 }
 
+#*******************************************************************
+=head2 function add_tree() - add tree species
+
+  Arguments:
+    %$attr
+      EXT_ID - external ID
+      SPECIES_ID - species ID
+      AGE - tree age
+      COORD_X - geo coordinate
+      COORD_Y - geo coordinate
+      STATUS - tree status
+      COMMENT - tree comment
+
+  Returns:
+    $self object
+
+  Examples:
+    $Tree->add_tree({
+      EXT_ID     => $FORM{EXTID},
+      SPECIES_ID => $FORM{SPECIES_ID},
+      AGE        => $FORM{AGE},
+      COORD_X    => $FORM{COORD_X},
+      COORD_Y    => $FORM{COORD_Y},
+      STATUS     => $FORM{STATUS},
+      COMMENT    => $FORM{COMMENT},
+    });
+
+=cut
+
+#*******************************************************************
+sub add_tree {
+  my $self = shift;
+  my ($attr) = @_;
+
+  $self->query_add('trees_species', {%$attr});
+
+  return $self;
+}
+
 #**********************************************************
 
 =head2 function tree_list() - show and search trees
@@ -326,16 +365,16 @@ sub tree_list {
   #  push @WHERE_RULES, "trees_tree.='$attr->{SUBORDINATION}'";
   #}
   #push @WHERE_RULES, "trees_tree.species_id=trees_species.id AND trees_species.type_id=trees_type.id";
-  if (defined($attr->{MIN_AGE})) {
+  if (defined($attr->{MIN_AGE})&& $attr->{MIN_AGE}!=0) {
     push @WHERE_RULES, "age>='$attr->{MIN_AGE}'";
   }
-  if (defined($attr->{MAX_AGE})) {
+  if (defined($attr->{MAX_AGE})&& $attr->{MAX_AGE}!=0) {
     push @WHERE_RULES, "age<='$attr->{MAX_AGE}'";
   }
-  if (defined($attr->{TYPE_ID})) {
+  if (defined($attr->{TYPE_ID})&& $attr->{TYPE_ID}!=0) {
     push @WHERE_RULES, "(SELECT type_id FROM trees_species WHERE id=species_id)='$attr->{TYPE_ID}'";
   }
-  if (defined($attr->{SPECIES_ID})) {
+  if (defined($attr->{SPECIES_ID})&& $attr->{SPECIES_ID}!=0) {
     push @WHERE_RULES, "species_id='$attr->{SPECIES_ID}'";
   }
   if (defined($attr->{STATUS})) {
