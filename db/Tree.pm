@@ -117,35 +117,6 @@ sub type_list {
 }
 
 #**********************************************************
-=head2 function type_info() - get type info
-
-  Arguments:
-    $attr
-      ID - type identifier
-  Returns:
-    $self object
-
-  Examples:
-    my $list = $Tree->type_info({ ID => 1 });
-  вона не працює чи я її не розумію
-
-=cut
-#**********************************************************
-sub type_info {
-	my $self = shift;
-  my ($attr) = @_;
-
-  if ($attr->{id}) {
-    $self->query2(
-      "SELECT * FROM trees_type 
-      WHERE id = ?;", undef, { id => 1, Bind => [ $attr->{id} ] }
-    );
-  }
-
-  return $self;
-}
-
-#**********************************************************
 =head2 function type_change() - change type
 
   Arguments:
@@ -316,8 +287,8 @@ sub species_change {
       EXT_ID     => $FORM{EXTID},
       SPECIES_ID => $FORM{SPECIES_ID},
       AGE        => $FORM{AGE},
-      COORDX    => $FORM{COORDX},
-      COORDY    => $FORM{COORDY},
+      COORDX     => $FORM{COORDX},
+      COORDY     => $FORM{COORDY},
       STATUS     => $FORM{STATUS},
       COMMENT    => $FORM{COMMENT},
     });
@@ -353,6 +324,53 @@ sub del_tree {
   my ($attr) = @_;
 
   $self->query_del('trees_tree', $attr);
+
+  return $self;
+}
+
+#**********************************************************
+=head2 function tree_change() - change tree
+
+  Arguments:
+    Arguments:
+    %$attr
+      ID - tree ID
+      EXT_ID - external ID
+      SPECIES_ID - species ID
+      AGE - tree age
+      COORD_X - geo coordinate
+      COORD_Y - geo coordinate
+      STATUS - tree status
+      COMMENT - tree comment
+
+  Returns:
+    $self object
+
+  Examples:
+    $Tree->tree_change({
+      ID         => $FORM{ID},
+      EXT_ID     => $FORM{EXTID},
+      SPECIES_ID => $FORM{SPECIES_ID},
+      AGE        => $FORM{AGE},
+      COORDX     => $FORM{COORDX},
+      COORDY     => $FORM{COORDY},
+      STATUS     => $FORM{STATUS},
+      COMMENT    => $FORM{COMMENT},
+    });
+
+=cut
+#**********************************************************
+sub tree_change {
+	my $self = shift;
+  my ($attr) = @_;
+
+  $self->changes2(
+    {
+      CHANGE_PARAM => 'ID',
+      TABLE        => 'trees_tree',
+      DATA         => $attr
+    }
+  );
 
   return $self;
 }
