@@ -316,8 +316,8 @@ sub species_change {
       EXT_ID     => $FORM{EXTID},
       SPECIES_ID => $FORM{SPECIES_ID},
       AGE        => $FORM{AGE},
-      COORD_X    => $FORM{COORD_X},
-      COORD_Y    => $FORM{COORD_Y},
+      COORDX    => $FORM{COORDX},
+      COORDY    => $FORM{COORDY},
       STATUS     => $FORM{STATUS},
       COMMENT    => $FORM{COMMENT},
     });
@@ -329,7 +329,7 @@ sub add_tree {
   my $self = shift;
   my ($attr) = @_;
 
-  $self->query_add('trees_species', {%$attr});
+  $self->query_add('trees_tree', {%$attr});
 
   return $self;
 }
