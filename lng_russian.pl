@@ -1,0 +1,21 @@
+$lang{ID}             = '#',
+$lang{TYPE}           = 'Тип дерева',
+$lang{LOGO}           = 'Список дерев',
+$lang{ADD}            = 'Добавить',
+$lang{CHANGE}         = 'Редактировать',
+$lang{SPECIES}        = 'Сорт',
+
+$lang{ADD_TYPE}       = 'Добавить тип',
+$lang{TREE}           = 'Общие дерева',
+$lang{ADD_SORT}       = 'Добавить сорт',
+$lang{ADD_TREE}       = 'Добавить дерево',
+
+$lang{ADD_MESSEGES}   = 'Добавлено',
+$lang{DEL_MESSEGES}   = 'Удалено',
+$lang{EDIT_MESSEGES}  = 'Змінити',
+$lang{SUC_SORT}       = 'Сорт добавлено в список',
+$lang{DEL_SORT}       = 'Сорт видалено з списка',
+$lang{EDIT_SORT}      = 'Ви намагаєтеся змніти данні',
+
+$lang{SUC_TYPE}       = 'Тип добавлено в список',
+$lang{DEL_TYPE}       = 'Тип видалено з списка',
