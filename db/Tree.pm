@@ -334,6 +334,29 @@ sub add_tree {
   return $self;
 }
 
+#*******************************************************************
+
+=head2 function del_tree() - delete tree from db
+  Arguments:
+    $attr
+
+  Returns:
+
+  Examples:
+    $Tree->del_tree=> 1} );
+
+=cut
+
+#*******************************************************************
+sub del_tree {
+  my $self = shift;
+  my ($attr) = @_;
+
+  $self->query_del('trees_tree', $attr);
+
+  return $self;
+}
+
 #**********************************************************
 
 =head2 function tree_list() - show and search trees
