@@ -377,7 +377,7 @@ sub tree_list {
   if (defined($attr->{SPECIES_ID})&& $attr->{SPECIES_ID}!=0) {
     push @WHERE_RULES, "species_id='$attr->{SPECIES_ID}'";
   }
-  if (defined($attr->{STATUS})) {
+  if (defined($attr->{STATUS})&& $attr->{STATUS} ne "") {
     push @WHERE_RULES, "status='$attr->{STATUS}'";
   }
   
