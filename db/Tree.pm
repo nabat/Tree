@@ -109,8 +109,8 @@ sub type_list {
   my $DESC        = ($attr->{DESC}) ? $attr->{DESC} : '';
 
   $self->query2(
-  "SELECT id, type_of_tree FROM trees_type",
-  undef, $attr
+      "SELECT id, type_of_tree FROM trees_type",
+      undef, $attr
   );
 
   return $self->{list};
@@ -134,15 +134,15 @@ sub type_list {
 =cut
 #**********************************************************
 sub type_change {
-	my $self = shift;
+  my $self = shift;
   my ($attr) = @_;
 
   $self->changes2(
-    {
-      CHANGE_PARAM => 'ID',
-      TABLE        => 'trees_type',
-      DATA         => $attr
-    }
+      {
+          CHANGE_PARAM => 'ID',
+          TABLE        => 'trees_type',
+          DATA         => $attr
+      }
   );
 
   return $self;
@@ -225,8 +225,8 @@ sub species_list {
   my $DESC        = ($attr->{DESC}) ? $attr->{DESC} : '';
 
   $self->query2(
-  "SELECT trees_species.id, type_of_tree, species,type_id FROM trees_species, trees_type WHERE type_id=trees_type.id ORDER BY $SORT $DESC",
-  undef, $attr
+      "SELECT trees_species.id, type_of_tree, species FROM trees_species, trees_type WHERE type_id=trees_type.id",
+      undef, $attr
   );
 
   return $self->{list};
@@ -252,15 +252,15 @@ sub species_list {
 =cut
 #**********************************************************
 sub species_change {
-	my $self = shift;
+  my $self = shift;
   my ($attr) = @_;
 
   $self->changes2(
-    {
-      CHANGE_PARAM => 'ID',
-      TABLE        => 'trees_species',
-      DATA         => $attr
-    }
+      {
+          CHANGE_PARAM => 'ID',
+          TABLE        => 'trees_species',
+          DATA         => $attr
+      }
   );
 
   return $self;
@@ -361,15 +361,15 @@ sub del_tree {
 =cut
 #**********************************************************
 sub tree_change {
-	my $self = shift;
+  my $self = shift;
   my ($attr) = @_;
 
   $self->changes2(
-    {
-      CHANGE_PARAM => 'ID',
-      TABLE        => 'trees_tree',
-      DATA         => $attr
-    }
+      {
+          CHANGE_PARAM => 'ID',
+          TABLE        => 'trees_tree',
+          DATA         => $attr
+      }
   );
 
   return $self;
@@ -421,13 +421,13 @@ sub tree_list {
   if (defined($attr->{STATUS})&& $attr->{STATUS} ne "") {
     push @WHERE_RULES, "status='$attr->{STATUS}'";
   }
-  
+
   my $WHERE = $self->search_former($attr, [],
-  { WHERE       => 1,
-    WHERE_RULES => \@WHERE_RULES
-  });
+      { WHERE       => 1,
+          WHERE_RULES => \@WHERE_RULES
+      });
   $self->query2(
-  "SELECT tr.id,
+      "SELECT tr.id,
           tr.ext_id,
           tr.species_id,
           tr.age,
@@ -441,7 +441,7 @@ sub tree_list {
           trees_tree AS tr
           $WHERE
           ORDER BY $SORT $DESC",
-  undef, $attr
+      undef, $attr
   );
 
   return $self->{list};
