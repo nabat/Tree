@@ -397,4 +397,79 @@ sub edit_tree {
     return 1;
 }
 
+sub add_trees {
+    my $Tree = Tree->new($db, $admin, \%conf);
+    my $type_list = $Tree->type_list({ COLS_NAME => 1});
+    my $species = $Tree->species_list({ COLS_NAME => 1});
+    my @files_type = ();
+    my @files_species = ();
+    my $place = 'Home';
+    my $cord_x = 48.537917;
+    my $cord_y = 25.024278;
+    my $location_id = 1;
+
+    if ($FORM{ADD}) {
+        $Tree->add_tree({
+            EXT_ID => $FORM{TREE_ID},
+            SPECIES_ID => $FORM{SPECIES_ID},
+            AGE => $FORM{AGE},
+            COORDX => $FORM{COORD_X},
+            COORDY => $FORM{COORD_Y},
+            STATUS => $FORM{STATUS},
+            COMMENT => $FORM{COMMENTS},
+        });
+        $html->message('info', $lang{ADD_MESSEGES}, $lang{SUC_TYPE});
+    } elsif ($FORM{del}) {
+        $Tree->del_species({ID => $FORM{del} });
+        $html->message('err', $lang{DEL_MESSEGES}, $lang{DEL_TYPE});
+    } elsif ($FORM{CHANGE}) {
+        $Tree->species_change(\%FORM);
+        $html->message('warn', $lang{EDIT_MESSEGES}, $lang{EDIT_MESSEGES});
+    }
+
+    $button_add = $html->form_input("ADD", $lang{ADD}, {TYPE => "submit"});
+    $button_change = $html->form_input("CHANGE", $lang{CHANGE}, {TYPE => "submit"});
+
+    push @files_type, "--";
+    foreach my $line (@$type_list) {
+        push @files_type, $line->{"type_of_tree"};
+    }
+    push @files_species, "--";
+    foreach my $line (@$species) {
+        push @files_species, $line->{"species"};
+    }
+
+    # print $coord_x." ".$coord_y;
+
+    $html->tpl_show(_include('main_page_four','Tree'), {
+        TYPE_TREE => $html->form_select(
+            'TYPE_ID',
+            {
+                SELECTED => $FORM{TYPE_ID},
+                SEL_ARRAY => \@files_type,
+                ARRAY_NUM_ID => 1,
+            }),
+        ID => $FORM{ID},
+        INDEX => $index,
+        BUTTON_ADD => $button_add,
+        BUTTON_CHANGE => $button_change,
+        ADD_TREE_SORT => $html->form_select(
+            'SPECIES_ID',
+            {
+                SELECTED => $FORM{SPECIES_ID},
+                SEL_ARRAY => \@files_species,
+                ARRAY_NUM_ID => 1,
+            }),
+        AGE => $html->form_input('AGE', $FORM{age}),
+        STATUS => $html->form_input('STATUS', $FORM{status}),
+        TREE_ID => $html->form_input('TREE_ID', $FORM{tree_id}),
+        CORD_X => $html->form_input('CORD_X', $FORM{cord_x}),
+        CORD_Y => $html->form_input('CORD_Y', $FORM{cord_y}),
+        PLACE => $place,
+        COORD_X => $cord_x,
+        COORD_Y => $cord_y,
+        LOCATION_ID => $location_id
+    });
+    return 1;
+
 1;
