@@ -117,35 +117,6 @@ sub type_list {
 }
 
 #**********************************************************
-=head2 function type_info() - get type info
-
-  Arguments:
-    $attr
-      ID - type identifier
-  Returns:
-    $self object
-
-  Examples:
-    my $list = $Tree->type_info({ ID => 1 });
-  вона не працює чи я її не розумію
-
-=cut
-#**********************************************************
-sub type_info {
-	my $self = shift;
-  my ($attr) = @_;
-
-  if ($attr->{id}) {
-    $self->query2(
-      "SELECT * FROM trees_type 
-      WHERE id = ?;", undef, { id => 1, Bind => [ $attr->{id} ] }
-    );
-  }
-
-  return $self;
-}
-
-#**********************************************************
 =head2 function type_change() - change type
 
   Arguments:
@@ -254,7 +225,7 @@ sub species_list {
   my $DESC        = ($attr->{DESC}) ? $attr->{DESC} : '';
 
   $self->query2(
-  "SELECT trees_species.id, type_of_tree, species FROM trees_species, trees_type WHERE type_id=trees_type.id",
+  "SELECT trees_species.id, type_of_tree, species,type_id FROM trees_species, trees_type WHERE type_id=trees_type.id ORDER BY $SORT $DESC",
   undef, $attr
   );
 
@@ -294,4 +265,186 @@ sub species_change {
 
   return $self;
 }
+
+#*******************************************************************
+=head2 function add_tree() - add tree species
+
+  Arguments:
+    %$attr
+      EXT_ID - external ID
+      SPECIES_ID - species ID
+      AGE - tree age
+      COORD_X - geo coordinate
+      COORD_Y - geo coordinate
+      STATUS - tree status
+      COMMENT - tree comment
+
+  Returns:
+    $self object
+
+  Examples:
+    $Tree->add_tree({
+      EXT_ID     => $FORM{EXTID},
+      SPECIES_ID => $FORM{SPECIES_ID},
+      AGE        => $FORM{AGE},
+      COORDX     => $FORM{COORDX},
+      COORDY     => $FORM{COORDY},
+      STATUS     => $FORM{STATUS},
+      COMMENT    => $FORM{COMMENT},
+    });
+
+=cut
+
+#*******************************************************************
+sub add_tree {
+  my $self = shift;
+  my ($attr) = @_;
+
+  $self->query_add('trees_tree', {%$attr});
+
+  return $self;
+}
+
+#*******************************************************************
+
+=head2 function del_tree() - delete tree from db
+  Arguments:
+    $attr
+
+  Returns:
+
+  Examples:
+    $Tree->del_tree=> 1} );
+
+=cut
+
+#*******************************************************************
+sub del_tree {
+  my $self = shift;
+  my ($attr) = @_;
+
+  $self->query_del('trees_tree', $attr);
+
+  return $self;
+}
+
+#**********************************************************
+=head2 function tree_change() - change tree
+
+  Arguments:
+    Arguments:
+    %$attr
+      ID - tree ID
+      EXT_ID - external ID
+      SPECIES_ID - species ID
+      AGE - tree age
+      COORD_X - geo coordinate
+      COORD_Y - geo coordinate
+      STATUS - tree status
+      COMMENT - tree comment
+
+  Returns:
+    $self object
+
+  Examples:
+    $Tree->tree_change({
+      ID         => $FORM{ID},
+      EXT_ID     => $FORM{EXTID},
+      SPECIES_ID => $FORM{SPECIES_ID},
+      AGE        => $FORM{AGE},
+      COORDX     => $FORM{COORDX},
+      COORDY     => $FORM{COORDY},
+      STATUS     => $FORM{STATUS},
+      COMMENT    => $FORM{COMMENT},
+    });
+
+=cut
+#**********************************************************
+sub tree_change {
+	my $self = shift;
+  my ($attr) = @_;
+
+  $self->changes2(
+    {
+      CHANGE_PARAM => 'ID',
+      TABLE        => 'trees_tree',
+      DATA         => $attr
+    }
+  );
+
+  return $self;
+}
+
+#**********************************************************
+
+=head2 function tree_list() - show and search trees
+
+  Arguments:
+    $attr
+      MIN_AGE
+      MAX_AGE
+      TYPE_ID
+      SPECIES_ID
+      STATUS
+  Returns:
+    @list
+
+  Examples:
+    my $list = $Tree->tree_list({COLS_NAME=>1});
+
+=cut
+
+#**********************************************************
+sub tree_list {
+  my $self = shift;
+  my ($attr) = @_;
+
+  my @WHERE_RULES = ();
+  my $SORT        = ($attr->{SORT}) ? $attr->{SORT} : 1;
+  my $DESC        = ($attr->{DESC}) ? $attr->{DESC} : '';
+  #if (defined($attr->{TYPE_ID})) {
+  #  push @WHERE_RULES, "trees_tree.='$attr->{SUBORDINATION}'";
+  #}
+  #push @WHERE_RULES, "trees_tree.species_id=trees_species.id AND trees_species.type_id=trees_type.id";
+  if (defined($attr->{MIN_AGE})&& $attr->{MIN_AGE}!=0) {
+    push @WHERE_RULES, "age>='$attr->{MIN_AGE}'";
+  }
+  if (defined($attr->{MAX_AGE})&& $attr->{MAX_AGE}!=0) {
+    push @WHERE_RULES, "age<='$attr->{MAX_AGE}'";
+  }
+  if (defined($attr->{TYPE_ID})&& $attr->{TYPE_ID}!=0) {
+    push @WHERE_RULES, "(SELECT type_id FROM trees_species WHERE id=species_id)='$attr->{TYPE_ID}'";
+  }
+  if (defined($attr->{SPECIES_ID})&& $attr->{SPECIES_ID}!=0) {
+    push @WHERE_RULES, "species_id='$attr->{SPECIES_ID}'";
+  }
+  if (defined($attr->{STATUS})&& $attr->{STATUS} ne "") {
+    push @WHERE_RULES, "status='$attr->{STATUS}'";
+  }
+  
+  my $WHERE = $self->search_former($attr, [],
+  { WHERE       => 1,
+    WHERE_RULES => \@WHERE_RULES
+  });
+  $self->query2(
+  "SELECT tr.id,
+          tr.ext_id,
+          tr.species_id,
+          tr.age,
+          tr.coordx,
+          tr.coordy,
+          tr.status,
+          tr.comment,
+          (SELECT species FROM trees_species WHERE id=species_id) AS species,
+          (SELECT type_id FROM trees_species WHERE id=species_id) AS type_id
+          FROM
+          trees_tree AS tr
+          $WHERE
+          ORDER BY $SORT $DESC",
+  undef, $attr
+  );
+
+  return $self->{list};
+}
+
 1;
